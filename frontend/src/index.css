@@ -1,8 +1,7 @@
-/* Contenedor que usa CSS Grid para las carpetas */
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(7, 1fr); /* 7 columnas de igual tamaño */
-  gap: 10px; /* Espacio entre las carpetas */
+  grid-template-columns: repeat(7, 1fr); 
+  gap: 10px;
   padding: 0;
   list-style: none;
 }
@@ -18,7 +17,7 @@
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   text-align: center;
-  height: 150px; /* Alto fijo para hacer las carpetas cuadradas */
+  height: 150px;
 }
 
 .grid-item p {
