@@ -209,7 +209,7 @@ const SuperAdminPage = () => {
                 {/* Lista de carpetas */}
                 <FolderList
                   carpetas={carpetas}
-                  setParentId={setCurrentFolder} // Este prop manejará el cambio de carpeta padre
+                  setParentId={setCurrentFolder}
                 />
                 {currentFolder && (
                   <DocumentList idCarpeta={currentFolder} />

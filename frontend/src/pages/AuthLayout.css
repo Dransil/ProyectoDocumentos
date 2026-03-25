@@ -1,4 +1,4 @@
-/* === Contenedor Principal === */
+/* Contenedor principal */
 .auth-background {
   position: relative;
   overflow: hidden;
@@ -19,7 +19,7 @@
   100% { background-position: 0% 0%; }
 }
 
-/* === Reflejo Solar (Efecto Agua) === */
+/* Reflejo solar (Efecto de agua) */
 .sun-glare {
   position: absolute;
   top: 0;
@@ -40,7 +40,7 @@
   100% { transform: translateX(20px); opacity: 0.5; }
 }
 
-/* === Partículas (Burbujas) === */
+/* Partículas (Burbujas) */
 .particles-container {
   position: absolute;
   top: 0;
@@ -66,7 +66,7 @@
   100% { transform: translateY(-110vh) translateX(30px); opacity: 0; }
 }
 
-/* === Círculos Decorativos === */
+/* Círculos decorativos */
 .decorative-circle {
   position: absolute;
   border-radius: 50%;
@@ -85,7 +85,7 @@
   100% { transform: translateY(30px); }
 }
 
-/* === Estilo Común para Tarjetas (Login/Register) === */
+/* Estilo para cards */
 .auth-content {
   width: 100%;
   max-width: 450px;

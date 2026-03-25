@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthLayout from "./AuthLayout"; // Asegúrate de tener el archivo AuthLayout que creamos
+import AuthLayout from "./AuthLayout";
 import "./Login.css";
 
 const Login = () => {
@@ -9,7 +9,6 @@ const Login = () => {
   const [mensaje, setMensaje] = useState({ text: "", type: "" });
   const navigate = useNavigate();
 
-  // Mantenemos tus 1000 partículas originales por funcionalidad
   const particles = useMemo(() => {
     return Array.from({ length: 1000 }).map((_, i) => (
       <div

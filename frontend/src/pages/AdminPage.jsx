@@ -157,7 +157,6 @@ const AdminPage = () => {
                     </div>
                   )}
 
-                  {/* CONTENIDO NUEVA PESTAÑA (VACÍA PARA TI) */}
                   {activeTab === 'nueva' && (
                     <div id="contenido-nuevo" className="py-4">
                       <BusquedaAvanzada idDependencia={usuario?.id_dependencia} />

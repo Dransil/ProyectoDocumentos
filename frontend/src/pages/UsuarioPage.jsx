@@ -48,21 +48,17 @@ const UsuarioPage = () => {
 
   return (
     <div className="d-flex" style={{ height: '100vh', overflow: 'hidden' }}>
-      {/* Sidebar se integra aquí */}
       <Sidebar role="Usuario" />
 
-      {/* Contenido principal con scroll */}
       <div className="content flex-grow-1 p-4" style={{ overflowY: 'auto', height: '100vh' }}>
         <h2>
           Bienvenido, Usuario <span className="text-primary">{usuario?.nombre_usuario}</span>
         </h2>
 
-        {/* Aquí manejamos las rutas */}
         <Routes>
           {/* Ruta para SEMAPA */}
           <Route path="/" element={
             <div style={{ height: '100vh', width: '100%' }}>
-              {/* Si está cargando, muestra un spinner */}
               {loading && (
                 <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                   <div className="spinner-border" role="status">
@@ -75,7 +71,7 @@ const UsuarioPage = () => {
                 style={{ height: '100%', width: '100%' }}
                 title="SEMAPA"
                 frameBorder="0"
-                onLoad={handleLoad} // Llamamos a handleLoad cuando se carga el iframe
+                onLoad={handleLoad}
               />
             </div>
           } />
@@ -107,13 +103,12 @@ const UsuarioPage = () => {
                 {/* Lista de carpetas */}
                 <FolderList
                   carpetas={carpetas}
-                  setParentId={setCurrentFolder} // Este prop manejará el cambio de carpeta padre
+                  setParentId={setCurrentFolder}
                 />
                 {currentFolder && (
                   <DocumentListUser
                     idCarpeta={currentFolder}
                     idDependencia={usuario?.id_dependencia || null} 
-                    // Pasamos id_dependencia como prop
                   />
                 )}
 

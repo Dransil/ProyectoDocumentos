@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthLayout from "./AuthLayout"; // Importamos el nuevo Layout unificado
+import AuthLayout from "./AuthLayout";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -15,12 +15,12 @@ const Register = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        // 1. Cargar dependencias
+        // Cargar dependencias
         const depResponse = await fetch("http://localhost:4001/api/dependencias/");
         const depData = await depResponse.json();
         setDependencias(depData);
 
-        // 2. Verificar si hay usuarios registrados para la lógica de Superadmin
+        // Verificar si hay usuarios registrados para la lógica de Superadmin
         const userResponse = await fetch("http://localhost:4001/api/usuarios/");
         const userData = await userResponse.json();
         

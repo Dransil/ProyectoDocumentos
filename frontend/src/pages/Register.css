@@ -1,4 +1,4 @@
-/* === Fondo animado tipo mar === */
+/* Fondo animado tipo mar */
 .register-background {
   position: relative;
   overflow: hidden;
@@ -18,7 +18,7 @@
   100% { background-position: 0% 0%; }
 }
 
-/* === Capas de olas y reflejo solar === */
+/* Capas de olas y reflejo solar */
 .register-background::before,
 .register-background::after {
   content: "";
@@ -52,7 +52,7 @@
   100% { transform: translateX(20px); opacity: 0.5; }
 }
 
-/* === Partículas flotantes === */
+/* Partículas flotantes */
 .particles {
   position: absolute;
   top: 0;
@@ -95,7 +95,7 @@
   100% { transform: translateY(-110vh) translateX(30px); opacity: 0; }
 }
 
-/* === Círculos decorativos === */
+/* Círculos decorativos */
 .decorative-circle {
   position: absolute;
   border-radius: 50%;
@@ -134,7 +134,7 @@
   100% { transform: translateY(25px); }
 }
 
-/* === Tarjeta (glassmorphism) === */
+/* Tarjeta (glassmorphism) */
 .register-card {
   width: 100%;
   max-width: 450px;
@@ -153,7 +153,7 @@
   transform: translateY(-5px);
 }
 
-/* === Inputs y botón === */
+/* Inputs y botón */
 .input-group-text {
   background: #e3f2fd;
   border: none;
@@ -183,7 +183,7 @@
   transform: translateY(-2px);
 }
 
-/* === Alertas === */
+/* Alertas */
 .alert {
   font-size: 0.9rem;
   padding: 0.5rem;
@@ -191,7 +191,7 @@
   text-align: center;
 }
 
-/* === Texto adicional === */
+/* Texto adicional */
 .text-center small a {
   color: #1565c0;
   text-decoration: none;

@@ -19,18 +19,18 @@ const AuthLayout = ({ children }) => {
 
   return (
     <div className="auth-background">
-      {/* Reflejo Solar Superior */}
+      {/* Reflejo solar superior */}
       <div className="sun-glare"></div>
 
-      {/* Círculos Decorativos */}
+      {/* Círculos decorativos */}
       <div className="decorative-circle circle1"></div>
       <div className="decorative-circle circle2"></div>
       <div className="decorative-circle circle3"></div>
 
-      {/* Capa de Partículas */}
+      {/* Capa de partículas */}
       <div className="particles-container">{particles}</div>
 
-      {/* Contenedor del Formulario (Login o Register) */}
+      {/* Contenedor del formulario (Login o Register) */}
       <div className="auth-content">
         {children}
       </div>

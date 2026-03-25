@@ -1,4 +1,4 @@
-/* === Fondo animado tipo mar === */
+/* Fondo animado tipo mar */
 .login-background {
   position: relative;
   overflow: hidden;
@@ -15,7 +15,7 @@
   100% { background-position: 0% 0%; }
 }
 
-/* === Capas de olas === */
+/* Capas de olas */
 .login-background::before,
 .login-background::after {
   content: "";
@@ -50,7 +50,7 @@
   100% { transform: translateX(20px); opacity: 0.5; }
 }
 
-/* === Partículas flotantes (burbujas/luz) === */
+/* Partículas flotantes (burbujas/luz) */
 .particles {
   position: absolute;
   top: 0;
@@ -99,7 +99,7 @@
   }
 }
 
-/* === Círculos decorativos === */
+/* Círculos decorativos */
 .decorative-circle {
   position: absolute;
   border-radius: 50%;
@@ -138,7 +138,7 @@
   100% { transform: translateY(25px); }
 }
 
-/* === Tarjeta (glassmorphism) === */
+/* Tarjeta (glassmorphism) */
 .login-card {
   width: 100%;
   max-width: 420px;
@@ -156,7 +156,7 @@
   transform: translateY(-5px);
 }
 
-/* === Inputs y botón === */
+/* Inputs y botón */
 .input-group-text {
   background: #e3f2fd;
   border: none;
@@ -186,7 +186,7 @@
   transform: translateY(-2px);
 }
 
-/* === Alertas === */
+/* Alertas */
 .alert {
   font-size: 0.9rem;
   padding: 0.5rem;
@@ -194,7 +194,7 @@
   text-align: center;
 }
 
-/* === Texto adicional === */
+/* Texto adicional */
 .text-center small a {
   color: #1565c0;
   text-decoration: none;
