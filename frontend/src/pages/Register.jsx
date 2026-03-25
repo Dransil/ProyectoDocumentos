@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Register.css"; // Asegúrate de importar los estilos
+import AuthLayout from "./AuthLayout"; // Importamos el nuevo Layout unificado
 
 const Register = () => {
   const navigate = useNavigate();
@@ -10,36 +10,47 @@ const Register = () => {
   const [dependencias, setDependencias] = useState([]);
   const [mensaje, setMensaje] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isFirstUser, setIsFirstUser] = useState(false);
 
   useEffect(() => {
-    const fetchDependencias = async () => {
+    const fetchInitialData = async () => {
       try {
-        const response = await fetch("http://localhost:4001/api/dependencias/");
-        const data = await response.json();
-        setDependencias(data);
+        // 1. Cargar dependencias
+        const depResponse = await fetch("http://localhost:4001/api/dependencias/");
+        const depData = await depResponse.json();
+        setDependencias(depData);
+
+        // 2. Verificar si hay usuarios registrados para la lógica de Superadmin
+        const userResponse = await fetch("http://localhost:4001/api/usuarios/");
+        const userData = await userResponse.json();
+        
+        if (userData.length === 0) {
+          setIsFirstUser(true);
+        }
       } catch (error) {
-        console.error("Error al cargar las dependencias", error);
+        console.error("Error al cargar datos iniciales", error);
       }
     };
-    fetchDependencias();
+    fetchInitialData();
   }, []);
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    if (!nombreUsuario || !contraseña || !idDependencia) {
-      setMensaje("Por favor, complete todos los campos.");
+    // Validación: idDependencia es obligatorio solo si NO es el primer usuario
+    if (!nombreUsuario || !contraseña || (!isFirstUser && !idDependencia)) {
+      setMensaje("Por favor, complete los campos obligatorios.");
       return;
     }
 
     const data = {
       nombre_usuario: nombreUsuario,
       contraseña: contraseña,
-      rol: "Usuario",
-      id_dependencia: idDependencia,
+      id_dependencia: idDependencia || null, 
     };
 
     setIsLoading(true);
+    setMensaje("");
 
     try {
       const response = await fetch("http://localhost:4001/api/usuarios/registrar", {
@@ -51,10 +62,13 @@ const Register = () => {
       const result = await response.json();
 
       if (response.ok) {
-        setMensaje("Registro exitoso. Redirigiendo al login...");
+        const saludo = result.rol === "Superadmin" 
+          ? "¡Bienvenido, Superadmin! Configuración inicial completa." 
+          : "Registro exitoso.";
+        setMensaje(`${saludo} Redirigiendo...`);
         setTimeout(() => navigate("/"), 2000);
       } else {
-        setMensaje("Error al registrar: " + result.message);
+        setMensaje("Error: " + result.message);
       }
     } catch {
       setMensaje("Error al conectar con el servidor.");
@@ -64,48 +78,57 @@ const Register = () => {
   };
 
   return (
-    <div className="register-background">
-      <div className="decorative-circle"></div>
-
+    <AuthLayout>
       <div className="register-card">
-        <h2 className="mb-4 text-center">Registrarse</h2>
-        {mensaje && <div className="alert alert-info">{mensaje}</div>}
+        <h2 className="mb-4 text-center"> REGISTRARSE </h2>
+        
+        {mensaje && (
+          <div className={`alert ${mensaje.includes("Error") ? "alert-danger" : "alert-info"}`}>
+            {mensaje}
+          </div>
+        )}
 
         <form onSubmit={handleRegister}>
           <div className="mb-3">
-            <label htmlFor="nombre_usuario" className="form-label">Nombre de usuario</label>
+            <label className="form-label">Nombre de usuario</label>
             <input
               type="text"
-              id="nombre_usuario"
               className="form-control"
               value={nombreUsuario}
               onChange={(e) => setNombreUsuario(e.target.value)}
+              placeholder=""
               required
+              disabled={isLoading}
             />
           </div>
 
           <div className="mb-3">
-            <label htmlFor="contraseña" className="form-label">Contraseña</label>
+            <label className="form-label">Contraseña</label>
             <input
               type="password"
-              id="contraseña"
               className="form-control"
               value={contraseña}
               onChange={(e) => setContraseña(e.target.value)}
+              placeholder="••••••••"
               required
+              disabled={isLoading}
             />
           </div>
 
           <div className="mb-3">
-            <label htmlFor="dependencia" className="form-label">Dependencia</label>
+            <label className="form-label">
+              Dependencia {isFirstUser && <span className="text-muted small">(Opcional para Superadmin)</span>}
+            </label>
             <select
-              id="dependencia"
-              className="form-control"
+              className="form-select"
               value={idDependencia}
               onChange={(e) => setIdDependencia(e.target.value)}
-              required
+              required={!isFirstUser}
+              disabled={isLoading}
             >
-              <option value="">Seleccionar dependencia</option>
+              <option value="">
+                {isFirstUser ? "-- Acceso Superadmin (Sin dependencia) --" : "Seleccionar dependencia"}
+              </option>
               {dependencias.map((d) => (
                 <option key={d.id_dependencia} value={d.id_dependencia}>
                   {d.nombre_dependencia}
@@ -115,15 +138,22 @@ const Register = () => {
           </div>
 
           <button type="submit" className="btn btn-primary w-100" disabled={isLoading}>
-            {isLoading ? "Registrando..." : "Registrar"}
+            {isLoading ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                Registrando...
+              </>
+            ) : "Registrar"}
           </button>
         </form>
 
-        <div className="mt-3 text-center">
-          <p>¿Ya tienes cuenta? <a href="/">Iniciar sesión</a></p>
+        <div className="mt-4 text-center">
+          <p className="small">
+            ¿Ya tienes cuenta? <a href="/" className="text-decoration-none">Iniciar sesión</a>
+          </p>
         </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 };
 

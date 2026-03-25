@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Routes, Route } from 'react-router-dom';
+import { useNavigate, Routes, Route } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import FolderList from '../components/FolderList';
 import CreateFolder from '../components/CreateFolder';
@@ -8,13 +7,21 @@ import SubirArchivo from '../components/SubirArchivo';
 import DocumentListAdmin from '../components/DocumentListAdmin';
 import GestionDocumentList from '../components/GestionDocumentList';
 import RevisarSolicitudes from '../components/RevisarSolicitud';
+import Notificacion from '../components/Notificaciones';
+import GestionClientes from '../components/GestionClientes';
+import BusquedaAvanzada from '../components/BusquedaAvanzada';
 
 const AdminPage = () => {
   const navigate = useNavigate();
   const usuario = JSON.parse(localStorage.getItem('usuario'));
+
+  // Estados de datos
   const [carpetas, setCarpetas] = useState([]);
   const [currentFolder, setCurrentFolder] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // ESTADO PARA TABS INTERNAS (Solo en la sección de Carpetas)
+  const [activeTab, setActiveTab] = useState('principal'); // 'principal' o 'nueva'
 
   const fetchCarpetas = async () => {
     try {
@@ -30,7 +37,6 @@ const AdminPage = () => {
     try {
       const response = await fetch(`http://localhost:4001/api/documentos/?id_carpeta=${currentFolder}`);
       const data = await response.json();
-      console.log(data.documentos);
     } catch (error) {
       console.error('Error al cargar los documentos:', error);
     }
@@ -40,6 +46,7 @@ const AdminPage = () => {
     setCurrentFolder(null);
     window.location.reload();
   };
+
   const handleLoad = () => {
     setLoading(false);
   };
@@ -50,26 +57,20 @@ const AdminPage = () => {
 
   return (
     <div className="d-flex" style={{ height: '100vh', overflow: 'hidden' }}>
-      {/* Sidebar se integra aquí */}
       <Sidebar role="Admin" />
 
-      {/* Contenido principal con scroll */}
       <div className="content flex-grow-1 p-4" style={{ overflowY: 'auto', height: '100vh' }}>
         <h2>
           Bienvenido, Admin <span className="text-primary">{usuario?.nombre_usuario}</span>
         </h2>
 
-        {/* Aquí manejamos las rutas */}
         <Routes>
-          {/* Ruta para SEMAPA */}
+          {/* RUTA: SEMAPA (RAÍZ) */}
           <Route path="/" element={
             <div style={{ height: '100vh', width: '100%' }}>
-              {/* Si está cargando, muestra un spinner */}
               {loading && (
                 <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-                  <div className="spinner-border" role="status">
-                    <span className="sr-only"></span>
-                  </div>
+                  <div className="spinner-border" role="status"></div>
                 </div>
               )}
               <iframe
@@ -77,56 +78,93 @@ const AdminPage = () => {
                 style={{ height: '100%', width: '100%' }}
                 title="SEMAPA"
                 frameBorder="0"
-                onLoad={handleLoad} // Llamamos a handleLoad cuando se carga el iframe
+                onLoad={handleLoad}
               />
             </div>
           } />
-          {/* Ruta para Carpetas */}
+
+          {/* OTRAS RUTAS */}
+          <Route path="/clientes" element={<GestionClientes />} />
           <Route path="/documentos" element={<GestionDocumentList idDependencia={usuario?.id_dependencia} />} />
           <Route path="/solicitudes" element={<RevisarSolicitudes />} />
+          <Route path="/notificaciones" element={<Notificacion />} />
+
+          {/* RUTA: CARPETAS (CON PESTAÑAS INTERNAS) */}
           <Route
             path="/carpetas"
             element={
               <>
-                <div className="mt-4">
-                  <h4>Gestión de Carpetas</h4>
-                  {currentFolder && usuario?.rol !== 'Usuario' && (
-                    <SubirArchivo
-                      idUsuario={usuario?.id_usuario}
-                      idCarpeta={currentFolder}
-                      fetchDocumentos={fetchDocumentos}
-                    />
+                {/* --- NAVEGACIÓN DE PESTAÑAS --- */}
+                <ul className="nav nav-tabs mt-4">
+                  <li className="nav-item">
+                    <button
+                      className={`nav-link ${activeTab === 'principal' ? 'active font-weight-bold' : ''}`}
+                      onClick={() => setActiveTab('principal')}
+                    >
+                      Carpetas y documentos
+                    </button>
+                  </li>
+                  <li className="nav-item">
+                    <button
+                      className={`nav-link ${activeTab === 'nueva' ? 'active font-weight-bold' : ''}`}
+                      onClick={() => setActiveTab('nueva')}
+                    >
+                      Busqueda avanzada
+                    </button>
+                  </li>
+                </ul>
+
+                <div className="tab-content border-left border-right border-bottom p-3 bg-white">
+
+                  {/* CONTENIDO PESTAÑA PRINCIPAL */}
+                  {activeTab === 'principal' && (
+                    <div id="contenido-principal">
+                      <div className="mt-4">
+                        <h4>Gestión de Carpetas</h4>
+                        {currentFolder && usuario?.rol !== 'Usuario' && (
+                          <SubirArchivo
+                            idUsuario={usuario?.id_usuario}
+                            idCarpeta={currentFolder}
+                            fetchDocumentos={fetchDocumentos}
+                          />
+                        )}
+                        <CreateFolder
+                          userId={usuario?.id_usuario}
+                          parentId={currentFolder}
+                          fetchFolders={fetchCarpetas}
+                        />
+                      </div>
+
+                      <hr />
+
+                      <FolderList
+                        carpetas={carpetas}
+                        setParentId={setCurrentFolder}
+                      />
+
+                      {currentFolder && (
+                        <DocumentListAdmin
+                          idCarpeta={currentFolder}
+                          idDependencia={usuario?.id_dependencia || null}
+                        />
+                      )}
+
+                      {currentFolder && (
+                        <button onClick={handleReset} className="btn btn-secondary mt-3">
+                          Regresar al directorio raíz
+                        </button>
+                      )}
+                    </div>
                   )}
-                  <CreateFolder
-                    userId={usuario?.id_usuario}
-                    parentId={currentFolder}
-                    fetchFolders={fetchCarpetas}
-                  />
+
+                  {/* CONTENIDO NUEVA PESTAÑA (VACÍA PARA TI) */}
+                  {activeTab === 'nueva' && (
+                    <div id="contenido-nuevo" className="py-4">
+                      <BusquedaAvanzada idDependencia={usuario?.id_dependencia} />
+                    </div>
+                  )}
+
                 </div>
-
-                <hr />
-
-                {/* Lista de carpetas */}
-                <FolderList
-                  carpetas={carpetas}
-                  setParentId={setCurrentFolder} // Este prop manejará el cambio de carpeta padre
-                />
-                {currentFolder && (
-                  <DocumentListAdmin
-                    idCarpeta={currentFolder}
-                    idDependencia={usuario?.id_dependencia || null} // Pasamos id_dependencia como prop
-                  />
-                )}
-
-                {/* Botón para regresar al directorio raíz */}
-                {currentFolder && (
-                  <button
-                    onClick={handleReset}
-                    className="btn btn-secondary mt-3"
-                  >
-                    Regresar al directorio raíz
-                  </button>
-                )}
               </>
             }
           />

@@ -1,12 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import './Login.css'; // Asegúrate de tener este CSS
+import AuthLayout from "./AuthLayout"; // Asegúrate de tener el archivo AuthLayout que creamos
+import "./Login.css";
 
 const Login = () => {
   const [nombreUsuario, setNombreUsuario] = useState("");
   const [contraseña, setContraseña] = useState("");
   const [mensaje, setMensaje] = useState({ text: "", type: "" });
   const navigate = useNavigate();
+
+  // Mantenemos tus 1000 partículas originales por funcionalidad
+  const particles = useMemo(() => {
+    return Array.from({ length: 1000 }).map((_, i) => (
+      <div
+        key={i}
+        className="particle"
+        style={{
+          left: `${Math.random() * 100}%`,
+          animationDelay: `${Math.random() * 10}s`,
+          animationDuration: `${8 + Math.random() * 6}s`,
+        }}
+      />
+    ));
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -19,9 +35,7 @@ const Login = () => {
     try {
       const response = await fetch("http://localhost:4001/api/usuarios/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),
       });
 
@@ -48,17 +62,15 @@ const Login = () => {
       } else {
         setMensaje({ text: data.message || "Error en las credenciales.", type: "error" });
       }
-    } catch (error) {
+    } catch {
       setMensaje({ text: "Error al conectar con el servidor.", type: "error" });
     }
   };
 
   return (
-    <div className="login-background d-flex justify-content-center align-items-center min-vh-100">
-      <div className="decorative-circle"></div>
-
-      <div className="card shadow-lg p-4 login-card">
-        <h3 className="text-center mb-4 text-primary">🔐 Iniciar Sesión</h3>
+    <AuthLayout>
+      <div className="login-card">
+        <h3 className="text-center mb-4"> INICIAR SESIÓN</h3>
 
         {mensaje.text && (
           <div className={`alert ${mensaje.type === "success" ? "alert-success" : "alert-danger"}`}>
@@ -78,7 +90,7 @@ const Login = () => {
                 value={nombreUsuario}
                 onChange={(e) => setNombreUsuario(e.target.value)}
                 required
-                placeholder="ej. admin123"
+                placeholder="Ingrese su nombre de usuario"
               />
             </div>
           </div>
@@ -105,10 +117,10 @@ const Login = () => {
         </form>
 
         <div className="text-center mt-3">
-          <small>¿No tienes cuenta? <a href="/register">Regístrate aquí</a></small>
+          <small>¿No tienes cuenta? <a href="/register" className="text-decoration-none">Regístrate aquí</a></small>
         </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 };
 

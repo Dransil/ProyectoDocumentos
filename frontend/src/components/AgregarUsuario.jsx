@@ -118,49 +118,6 @@ const AgregarUsuario = () => {
       <button className="btn btn-primary" onClick={toggleForm}>
         {isFormVisible ? "Cerrar Formulario" : "Agregar Usuario"}
       </button>
-
-      {/* Tabla de usuarios existentes */}
-      <div className="mt-4">
-        <h3>Usuarios Registrados</h3>
-        <table className="table table-striped">
-          <thead>
-            <tr>
-              <th>Nombre de Usuario</th>
-              <th>Rol</th>
-              <th>Dependencia</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {usuarios.length > 0 ? (
-              usuarios.map((usuario) => (
-                <tr key={usuario.id_usuario}>
-                  <td>{usuario.nombre_usuario}</td>
-                  <td>{usuario.rol}</td>
-                  <td>
-                    {
-                      dependencias.find((dep) => dep.id_dependencia === usuario.id_dependencia)?.nombre_dependencia
-                    }
-                  </td>
-                  <td>
-                    <button
-                      className="btn btn-warning btn-sm"
-                      onClick={() => handleSelectUsuario(usuario)}
-                    >
-                      Editar
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4">No hay usuarios registrados.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
       {/* Formulario para agregar/modificar usuario */}
       {isFormVisible && (
         <div className="mt-3">
@@ -206,16 +163,60 @@ const AgregarUsuario = () => {
             </select>
           </div>
 
-          <div className="mb-3">
+          <div className="mb-3 d-flex gap-2">
             <button className="btn btn-success" onClick={handleSave}>
               {usuarioSeleccionado ? "Guardar Cambios" : "Guardar Usuario"}
             </button>
-            <button className="btn btn-secondary ml-2" onClick={handleCancel}>
+            <button className="btn btn-secondary" onClick={handleCancel}>
               Cancelar
             </button>
           </div>
+
         </div>
       )}
+      {/* Tabla de usuarios existentes */}
+      <div className="mt-4">
+        <h3>Usuarios Registrados</h3>
+        <table className="table table-striped">
+          <thead>
+            <tr>
+              <th>Nombre de Usuario</th>
+              <th>Rol</th>
+              <th>Dependencia</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {usuarios.length > 0 ? (
+              usuarios.map((usuario) => (
+                <tr key={usuario.id_usuario}>
+                  <td>{usuario.nombre_usuario}</td>
+                  <td>{usuario.rol}</td>
+                  <td>
+                    {
+                      dependencias.find((dep) => dep.id_dependencia === usuario.id_dependencia)?.nombre_dependencia
+                    }
+                  </td>
+                  <td>
+                    <button
+                      className="btn btn-warning btn-sm"
+                      onClick={() => handleSelectUsuario(usuario)}
+                    >
+                      Editar
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4">No hay usuarios registrados.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+
 
       {/* Mensaje de éxito o error */}
       {message && (

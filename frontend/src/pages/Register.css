@@ -1,57 +1,202 @@
+/* === Fondo animado tipo mar === */
 .register-background {
-  background: linear-gradient(135deg, #e0f7fa, #b3e5fc, #81d4fa);
-  background-size: 400% 400%;
-  animation: gradientMove 8s ease infinite;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   position: relative;
   overflow: hidden;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0d47a1 0%, #1976d2 45%, #4fc3f7 100%);
+  background-size: 400% 400%;
+  animation: backgroundFlow 12s ease-in-out infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 20px;
 }
 
-@keyframes gradientMove {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+@keyframes backgroundFlow {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
 }
 
-.decorative-circle {
+/* === Capas de olas y reflejo solar === */
+.register-background::before,
+.register-background::after {
+  content: "";
   position: absolute;
-  bottom: -100px;
-  left: -100px;
-  width: 250px;
-  height: 250px;
-  background: rgba(33, 150, 243, 0.15);
-  border-radius: 50%;
-  animation: pulse 3s ease-in-out infinite alternate;
+  left: 0;
+  width: 200%;
+  height: 220px;
+  bottom: 0;
+  background-repeat: repeat-x;
+  transform: translate3d(0, 0, 0);
+  opacity: 0.3;
+}
+
+.register-background::before {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at 50% 20%,
+    rgba(255, 255, 255, 0.25),
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  animation: sunGlare 10s ease-in-out infinite alternate;
   z-index: 0;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.3;
-  }
-  100% {
-    transform: scale(1.2);
-    opacity: 0.6;
-  }
+@keyframes sunGlare {
+  0% { transform: translateX(-20px); opacity: 0.3; }
+  100% { transform: translateX(20px); opacity: 0.5; }
 }
 
+/* === Partículas flotantes === */
+.particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.particle {
+  position: absolute;
+  bottom: -20px;
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  animation: floatUp 8s linear infinite;
+}
+
+.particle:nth-child(odd) {
+  width: 4px;
+  height: 4px;
+  animation-duration: 10s;
+  animation-delay: 2s;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.particle:nth-child(even) {
+  width: 8px;
+  height: 8px;
+  animation-duration: 12s;
+  animation-delay: 4s;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  20% { opacity: 0.8; }
+  100% { transform: translateY(-110vh) translateX(30px); opacity: 0; }
+}
+
+/* === Círculos decorativos === */
+.decorative-circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(30px);
+  opacity: 0.25;
+  animation: float 10s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+.circle1 {
+  width: 220px;
+  height: 220px;
+  top: -60px;
+  right: -100px;
+  background: rgba(33, 150, 243, 0.5);
+}
+
+.circle2 {
+  width: 280px;
+  height: 280px;
+  bottom: -120px;
+  left: -120px;
+  background: rgba(3, 169, 244, 0.4);
+}
+
+.circle3 {
+  width: 160px;
+  height: 160px;
+  bottom: 100px;
+  right: 120px;
+  background: rgba(0, 188, 212, 0.3);
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(25px); }
+}
+
+/* === Tarjeta (glassmorphism) === */
 .register-card {
-  background-color: white;
-  border-radius: 16px;
-  padding: 30px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 450px;
-  z-index: 1;
+  position: relative;
+  z-index: 5;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 30px;
+  transition: transform 0.3s ease;
+}
+
+.register-card:hover {
+  transform: translateY(-5px);
+}
+
+/* === Inputs y botón === */
+.input-group-text {
+  background: #e3f2fd;
+  border: none;
+}
+
+.form-control {
+  border: none;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.form-control:focus {
+  background: #fff;
+  box-shadow: 0 0 5px rgba(33, 150, 243, 0.5);
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #1565c0, #42a5f5);
+  border: none;
+  border-radius: 10px;
+  padding: 0.7rem;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(90deg, #0d47a1, #1e88e5);
+  transform: translateY(-2px);
+}
+
+/* === Alertas === */
+.alert {
+  font-size: 0.9rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* === Texto adicional === */
+.text-center small a {
+  color: #1565c0;
+  text-decoration: none;
+}
+
+.text-center small a:hover {
+  text-decoration: underline;
 }

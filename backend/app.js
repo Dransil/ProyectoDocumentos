@@ -12,6 +12,7 @@ const usuariosRoutes = require('./routes/usuarios');
 const carpetasRoutes = require('./routes/carpetas'); 
 const documentosRoutes = require('./routes/documentos');
 const solicitudRoutes = require('./routes/solicitudes');
+const clienteRoutes = require('./routes/clientes');
 
 app.use(cors());
 app.use(express.json());
@@ -30,6 +31,7 @@ app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/carpetas', carpetasRoutes);
 app.use('/api/documentos', documentosRoutes);
 app.use('/api/solicitudes', solicitudRoutes);
+app.use('/api/clientes', clienteRoutes);
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 

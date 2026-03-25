@@ -6,6 +6,7 @@ import CreateFolder from '../components/CreateFolder';
 import SubirArchivo from '../components/SubirArchivo';
 import CrearSolicitud from '../components/CrearSolicitud';
 import DocumentListUser from '../components/DocumentListUser';
+import Notificacion from '../components/Notificaciones';
 
 const UsuarioPage = () => {
   const navigate = useNavigate();
@@ -128,6 +129,8 @@ const UsuarioPage = () => {
               </>
             }
           />
+          {/* Cambiar a notificaciones */}
+          <Route path="/notificaciones" element={<Notificacion  />} />
         </Routes>
       </div>
     </div>

@@ -97,7 +97,7 @@ const Dependencias = () => {
               onChange={(e) => setNombreDependencia(e.target.value)}
             />
           </div>
-          <div className="mb-3">
+          <div className="mb-3 d-flex gap-2">
             <button className="btn btn-success" onClick={handleSave}>
               {isEditMode ? "Modificar Dependencia" : "Guardar Dependencia"}
             </button>

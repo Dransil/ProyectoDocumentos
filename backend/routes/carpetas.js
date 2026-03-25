@@ -56,7 +56,7 @@ router.post('/crear', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const query = `
-        SELECT c.id_carpeta, c.nombre, c.id_usuario, c.id_padre, u.nombre_usuario AS usuario_nombre
+        SELECT c.id_carpeta, c.nombre, c.id_usuario, c.id_padre, u.nombre_usuario AS usuario_nombre, c.fecha_creacion
         FROM carpetas c
         LEFT JOIN usuarios u ON c.id_usuario = u.id_usuario
       `;
@@ -67,6 +67,27 @@ router.get('/', async (req, res) => {
     }
 
     res.status(200).json({ carpetas: result.rows });
+  } catch (error) {
+    res.status(500).json({ message: 'Error en el servidor', error: error.message });
+  }
+});
+// Buscar carpeta por nombre exacto (para el año extraído por OCR)
+router.get('/buscar-por-nombre/:nombre', async (req, res) => {
+  try {
+    const { nombre } = req.params;
+    const query = `
+        SELECT id_carpeta, nombre 
+        FROM carpetas 
+        WHERE nombre = $1 
+        LIMIT 1
+      `;
+    const result = await db.query(query, [nombre]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Carpeta no encontrada' });
+    }
+
+    res.status(200).json(result.rows[0]);
   } catch (error) {
     res.status(500).json({ message: 'Error en el servidor', error: error.message });
   }

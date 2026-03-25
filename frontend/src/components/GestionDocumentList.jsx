@@ -11,12 +11,12 @@ const GestionDocumentList = ({ idDependencia }) => {
   const [formData, setFormData] = useState({
     nombre_documento: "",
     estado: "publico",
-    usuarios_prohibidos: [],
+    usuarios_prohibidos: [], // Internamente sigue siendo este nombre por la BD
     ruta_fisica: "",
     archivo: null,
   });
 
-  // Obtener documentos y usuarios
+  // Carga de datos inicial
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -62,6 +62,7 @@ const GestionDocumentList = ({ idDependencia }) => {
     setFormData({ ...formData, archivo: e.target.files[0] });
   };
 
+  // Lógica de "Permitidos" (Whitelist)
   const handleAddUsuario = (usuarioId) => {
     if (!formData.usuarios_prohibidos.includes(usuarioId)) {
       setFormData((prev) => ({
@@ -83,6 +84,7 @@ const GestionDocumentList = ({ idDependencia }) => {
     const formDataToSend = new FormData();
     formDataToSend.append("nombre_documento", formData.nombre_documento);
     formDataToSend.append("estado", formData.estado);
+    // Se envía como string para que el backend lo procese como integer[]
     formDataToSend.append("usuarios_prohibidos", formData.usuarios_prohibidos.join(","));
     formDataToSend.append("ruta_fisica", formData.ruta_fisica);
     if (formData.archivo) formDataToSend.append("archivo", formData.archivo);
@@ -96,7 +98,7 @@ const GestionDocumentList = ({ idDependencia }) => {
         }
       );
       if (res.ok) {
-        alert("Documento modificado exitosamente");
+        alert("Configuración de acceso actualizada");
         setDocumentos((prev) =>
           prev.map((doc) =>
             doc.id_documento === selectedDocumento.id_documento
@@ -107,10 +109,10 @@ const GestionDocumentList = ({ idDependencia }) => {
         setSelectedDocumento(null);
       } else {
         const errorData = await res.json();
-        console.error("Error:", errorData.message);
+        console.error("Error al modificar:", errorData.message);
       }
     } catch (error) {
-      console.error("Error al enviar la solicitud:", error);
+      console.error("Error en la solicitud:", error);
     }
   };
 
@@ -121,24 +123,23 @@ const GestionDocumentList = ({ idDependencia }) => {
   const filteredUsuarios = usuarios.filter(
     (usuario) =>
       !formData.usuarios_prohibidos.includes(usuario.id_usuario) &&
-      (usuario.nombre_usuario || usuario.email)
-        .toLowerCase()
-        .includes(searchUsuario.toLowerCase())
+      (usuario.nombre_usuario || "").toLowerCase().includes(searchUsuario.toLowerCase())
   );
 
   return (
     <Container>
-      <h3>Gestión de Documentos</h3>
+      <h3>Gestión de Accesos y Permisos</h3>
       <SearchInput
         type="text"
-        placeholder="Buscar documentos..."
+        placeholder="Buscar documento en la dependencia..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
+
       {loading ? (
         <p>Cargando documentos...</p>
       ) : filteredDocumentos.length === 0 ? (
-        <p>No se encontraron documentos</p>
+        <p>No se encontraron documentos en esta sección.</p>
       ) : (
         <ButtonGrid>
           {filteredDocumentos.map((documento) => (
@@ -151,68 +152,94 @@ const GestionDocumentList = ({ idDependencia }) => {
           ))}
         </ButtonGrid>
       )}
+
       {selectedDocumento && (
         <FormContainer onSubmit={handleFormSubmit}>
-          <h4>Modificar Documento</h4>
+          <HeaderRow>
+            <h4>Permisos: {selectedDocumento.nombre_documento}</h4>
+            <CloseBtn type="button" onClick={() => setSelectedDocumento(null)}>×</CloseBtn>
+          </HeaderRow>
+
+          <label>Título del Documento</label>
           <Input
             type="text"
             name="nombre_documento"
             value={formData.nombre_documento}
             onChange={handleInputChange}
-            placeholder="Nombre del Documento"
             required
           />
-          <Select
-            name="estado"
-            value={formData.estado}
-            onChange={handleInputChange}
-          >
-            <option value="publico">Público</option>
-            <option value="privado">Privado</option>
+
+          <label>Nivel de Visibilidad</label>
+          <Select name="estado" value={formData.estado} onChange={handleInputChange}>
+            <option value="publico">Público (Solo los de la lista blanca)</option>
+            <option value="privado">Privado (Solo Administradores)</option>
           </Select>
-          <h5><strong>Usuarios prohibidos</strong></h5>
+
+          <Divider />
+
+          <h5><strong style={{ color: '#1b5e20' }}>✓ Usuarios con Acceso Permitido</strong></h5>
+          <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '1rem' }}>
+            Añade a los usuarios que tendrán autorización para visualizar este archivo.
+          </p>
 
           <SearchInput
             type="text"
-            placeholder="Buscar usuarios..."
+            placeholder="Escribe el nombre del usuario..."
             value={searchUsuario}
             onChange={(e) => setSearchUsuario(e.target.value)}
           />
-          {filteredUsuarios.length > 0 ? (
-            filteredUsuarios.map((usuario) => (
-              <UserItem key={usuario.id_usuario}>
-                <span>{usuario.nombre_usuario || usuario.email}</span>
-                <Button type="button" onClick={() => handleAddUsuario(usuario.id_usuario)}>
-                  Añadir
-                </Button>
-              </UserItem>
-            ))
-          ) : (
-            <p>No hay usuarios disponibles</p>
-          )}
-          <h5><strong>Usuarios seleccionados: </strong></h5>
 
-          {formData.usuarios_prohibidos.map((id) => (
-            <UserItem key={id}>
-              <span>
-                {usuarios.find((u) => u.id_usuario === id)?.nombre_usuario || id}
-              </span>
-              <Button type="button" onClick={() => handleRemoveUsuario(id)}>
-                Quitar
-              </Button>
-            </UserItem>
-          ))}
+          <UserScrollArea>
+            {filteredUsuarios.length > 0 ? (
+              filteredUsuarios.map((u) => (
+                <UserItem key={u.id_usuario}>
+                  <span>{u.nombre_usuario}</span>
+                  <ActionButton type="button" $mode="add" onClick={() => handleAddUsuario(u.id_usuario)}>
+                    Dar Acceso
+                  </ActionButton>
+                </UserItem>
+              ))
+            ) : (
+              <p style={{ fontSize: '0.85rem', textAlign: 'center', color: '#94a3b8' }}>No hay más usuarios disponibles</p>
+            )}
+          </UserScrollArea>
+
+          <h5 className="mt-4"><strong>Acceso Concedido a:</strong></h5>
+          <UserScrollArea style={{ background: '#f0fdf4', border: '1px solid #dcfce7' }}>
+            {formData.usuarios_prohibidos.length > 0 ? (
+              formData.usuarios_prohibidos.map((id) => (
+                <UserItem key={id}>
+                  <span style={{ fontWeight: '600' }}>
+                    {usuarios.find((u) => u.id_usuario === id)?.nombre_usuario || `Usuario ${id}`}
+                  </span>
+                  <ActionButton type="button" $mode="remove" onClick={() => handleRemoveUsuario(id)}>
+                    Quitar Acceso
+                  </ActionButton>
+                </UserItem>
+              ))
+            ) : (
+              <p style={{ fontSize: '0.85rem', textAlign: 'center', color: '#ef4444' }}>
+                Atención: Nadie tiene acceso permitido actualmente.
+              </p>
+            )}
+          </UserScrollArea>
+
+          <Divider />
+
+          <label>Localización Física (Archivo)</label>
           <Input
             type="text"
             name="ruta_fisica"
             value={formData.ruta_fisica}
             onChange={handleInputChange}
-            placeholder="Ruta Física"
-            required
+            placeholder="Ej: Estante A, Fila 3"
           />
+
+          <label>Reemplazar archivo digital (opcional)</label>
           <Input type="file" name="archivo" onChange={handleFileChange} />
+
           <FormActions>
-            <Button type="submit" primary>
+            <Button type="submit" $primary>
               Guardar Cambios
             </Button>
             <Button type="button" onClick={() => setSelectedDocumento(null)}>
@@ -227,60 +254,115 @@ const GestionDocumentList = ({ idDependencia }) => {
 
 export default GestionDocumentList;
 
+// --- Estilos ---
 
-// Styled Components
 const Container = styled.div`
   margin-top: 1rem;
-  font-family: Arial, sans-serif;
+`;
+
+const Divider = styled.hr`
+  margin: 1.5rem 0;
+  border: 0;
+  border-top: 1px solid #e2e8f0;
+`;
+
+const HeaderRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+`;
+
+const CloseBtn = styled.button`
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #94a3b8;
+  &:hover { color: #ef4444; }
+`;
+
+const UserScrollArea = styled.div`
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 0.8rem;
+  background: #f8fafc;
+  border-radius: 10px;
+  margin-bottom: 1rem;
 `;
 
 const SearchInput = styled.input`
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.7rem;
   margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  &:focus { outline: none; border-color: #3b82f6; }
 `;
 
 const ButtonGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 15px;
 `;
 
 const Button = styled.button`
-  padding: 0.5rem;
-  background-color: ${(props) => (props.primary ? "#007BFF" : "#f0f0f0")};
-  border: none;
-  border-radius: 4px;
-  color: ${(props) => (props.primary ? "white" : "black")};
+  padding: 0.7rem;
+  border-radius: 10px;
   cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  background: ${(props) => (props.$primary ? '#2563eb' : '#fff')};
+  color: ${(props) => (props.$primary ? 'white' : '#1e293b')};
+  border: ${(props) => (props.$primary ? 'none' : '1px solid #e2e8f0')};
+
   &:hover {
-    background-color: ${(props) => (props.primary ? "#0056b3" : "#e0e0e0")};
+    background: ${(props) => (props.$primary ? '#1d4ed8' : '#f1f5f9')};
   }
+`;
+
+const ActionButton = styled.button`
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.8rem;
+  cursor: pointer;
+  background: ${(props) => (props.$mode === 'add' ? '#dcfce7' : '#fee2e2')};
+  color: ${(props) => (props.$mode === 'add' ? '#166534' : '#991b1b')};
+  &:hover { opacity: 0.8; }
 `;
 
 const FormContainer = styled.form`
   margin-top: 2rem;
-  padding: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 2.5rem;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f1f5f9;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+  }
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 0.7rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
 `;
 
 const Select = styled.select`
   width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 0.7rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
 `;
 
 const FormActions = styled.div`
@@ -293,5 +375,9 @@ const UserItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 0.4rem;
+  border: 1px solid #f1f5f9;
 `;
